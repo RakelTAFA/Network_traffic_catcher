@@ -41,7 +41,7 @@ int main()
 
 		try {
 			device_number_selected = stoi(device_input_choice);
-			if (device_number_selected > number_of_devices)
+			if (device_number_selected > number_of_devices || device_number_selected == 0)
 				throw out_of_range("");
 			break;
 		}
@@ -55,11 +55,23 @@ int main()
 		}
 	}
 
-	pcap_if_t* selected_device = &all_devices[device_number_selected - 1];
+	pcap_if_t* selected_device = all_devices;
+	
+	for (int i = 0; i < device_number_selected - 1; i++)
+	{
+		if (selected_device != NULL)
+			selected_device = selected_device->next;
+	}
+
+	if (selected_device == NULL)
+	{
+		printf("Error while selecting device...");
+		exit(1);
+	}
+
 	printf("\nYou selected %s", selected_device->description);
 
-	//pcap_open_live(selected_device->name, 4096, 0, 100, error_buffer);
-
+    pcap_open_live(selected_device->name, 4096, 0, 100, error_buffer);
 
 	pcap_freealldevs(all_devices);
 	return 0;
