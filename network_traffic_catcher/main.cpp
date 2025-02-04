@@ -13,6 +13,7 @@ void stop_program(int);
 
 int main()
 {
+	// Handle Contorl C command differently
 	signal(SIGINT, stop_program);
 
 	pcap_if_t* all_devices = NULL;
@@ -97,6 +98,25 @@ int main()
 
 	printf("\nListening on %s...\n", selected_device->description);
 
+	// Port 80 for HTTP, port 443 for HTTPS : we filter websites
+	char packet_filter[] = "port 80 or port 443";
+	struct bpf_program filter_code;
+	u_int netmask = 0xFFFFFF; // = 255.255.255.0, for class C networks
+
+	if (pcap_compile(capture, &filter_code, packet_filter, 1, netmask) < 0)
+	{
+		printf("\nUnable to compile the packet filter. Check the syntax.\n");
+		pcap_freealldevs(all_devices);
+		return -1;
+	}
+
+	if (pcap_setfilter(capture, &filter_code) < 0)
+	{
+		printf("\nError setting the filter.\n");
+		pcap_freealldevs(all_devices);
+		return -1;
+	}
+
 	pcap_loop(capture, 0, packet_handler, NULL);
 
 	pcap_close(capture);
@@ -135,7 +155,6 @@ void packet_handler(u_char* param, const struct pcap_pkthdr* header, const u_cha
 	u_int ip_len = (ip_h->version_ip_header_length & 0xF) * 4;
 
 	tcp_h = (tcp_header*)((u_char*)ip_h + ip_len);
-
 	printf("Source port: %d - Destination port: %d\n", tcp_h->src_port, tcp_h->dst_port);
 }
 
