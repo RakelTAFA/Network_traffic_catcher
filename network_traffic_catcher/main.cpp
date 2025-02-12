@@ -2,8 +2,11 @@
 #include<string>
 #include<stdexcept>
 #include<csignal>
+#include<sstream>
+#include<WS2tcpip.h>
 #include "ip_header.h"
 #include "tcp_header.h"
+#pragma comment (lib, "Ws2_32.lib")
 using namespace std;
 
 
@@ -99,7 +102,7 @@ int main()
 	printf("\nListening on %s...\n", selected_device->description);
 
 	// Port 80 for HTTP, port 443 for HTTPS : we filter websites
-	char packet_filter[] = "port 80 or port 443";
+	char packet_filter[] = "dst port 80 or dst port 443";
 	struct bpf_program filter_code;
 	u_int netmask = 0xFFFFFF; // = 255.255.255.0, for class C networks
 
@@ -117,6 +120,13 @@ int main()
 		return -1;
 	}
 
+	WSADATA wsaData = { 0 };
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+	{
+		printf("WSAStartup failed: %d\n", WSAGetLastError());
+		return -1;
+	}
+
 	pcap_loop(capture, 0, packet_handler, NULL);
 
 	pcap_close(capture);
@@ -128,34 +138,49 @@ int main()
 
 void packet_handler(u_char* param, const struct pcap_pkthdr* header, const u_char* pkt_data)
 {
-	struct tm ltime;
-	char timestr[16];
-	time_t local_tv_sec;
-
 	ip_header* ip_h;
 	tcp_header* tcp_h;
 
 	// Unused variable
 	(VOID)(param);
 
-	/* convert the timestamp to readable format */
-	local_tv_sec = header->ts.tv_sec;
-	localtime_s(&ltime, &local_tv_sec);
-	strftime(timestr, sizeof timestr, "%H:%M:%S", &ltime);
-
-	printf("%s,%.6d len:%d\n",
-		timestr, header->ts.tv_usec, header->len);
-
 	// 14 = Ethernet header length, we skip it to access IPv4 header layer
 	ip_h = (ip_header*)(pkt_data + 14);
 
 	// version_ip_header_length contains 2 values : version (4 left bits) and ip_header_length (4 right bits)
 	// We want to extract the second value, 0xF = 0000 1111. The following line extracts only the last 4 bits we need.
-	// We multiply by 4 to acces the end of the IP Header ad the beggining of the TCP Header.
+	// We multiply by 4 to acces the end of the IP Header ad the beginning of the TCP Header.
 	u_int ip_len = (ip_h->version_ip_header_length & 0xF) * 4;
 
 	tcp_h = (tcp_header*)((u_char*)ip_h + ip_len);
-	printf("Source port: %d - Destination port: %d\n", tcp_h->src_port, tcp_h->dst_port);
+
+	struct sockaddr_in sa;
+	char host[NI_MAXHOST] = "";
+	char serv[NI_MAXSERV] = "";
+
+	sa.sin_family = AF_INET;
+	sa.sin_port = 443;
+
+	printf("%d.%d.%d.%d\n", ip_h->dst_addr.byte1, ip_h->dst_addr.byte2, ip_h->dst_addr.byte3, ip_h->dst_addr.byte4);
+
+	ostringstream ip_address_stream;
+	ip_address_stream << (int)ip_h->dst_addr.byte1 << '.' << (int)ip_h->dst_addr.byte2 << '.' << (int)ip_h->dst_addr.byte3 << '.' << (int)ip_h->dst_addr.byte4;
+	
+	// We need to convert a string into a const char* to run the following function
+	string ip_address_raw = ip_address_stream.str();
+	const char* ip_address_string = ip_address_raw.c_str();
+	
+	inet_pton(AF_INET, ip_address_string, &sa.sin_addr);
+
+	if (getnameinfo((struct sockaddr*)&sa, sizeof(sa), host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICSERV) == 0)
+	{
+		printf("Resolved : %s\n", host);
+	}
+	else
+	{
+		printf("Impossible to resolve DNS Name (ERROR %d).\n", WSAGetLastError());
+	}
+	
 }
 
 
