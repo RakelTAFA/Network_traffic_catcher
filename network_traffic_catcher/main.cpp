@@ -127,7 +127,7 @@ int main()
 		return -1;
 	}
 
-	pcap_loop(capture, 0, packet_handler, NULL);
+	pcap_loop(capture, 10, packet_handler, NULL); // Limit to 10 iterations for the moment in order to test
 
 	pcap_close(capture);
 
