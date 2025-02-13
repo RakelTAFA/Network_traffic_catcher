@@ -24,19 +24,6 @@ int main()
 
 	deviceManager->printDeviceList();
 
-	/*printf("Listing all available devices...\n");
-
-	for (pcap_if_t* devs = all_devices; devs != NULL; devs = devs->next)
-	{
-		printf("%d.", ++number_of_devices);
-        if (devs->description)
-        {
-            printf(" %s\n", devs->description);
-        }
-		else
-			printf(" %s (No description available)\n", devs->name);
-	}*/
-
 	unsigned short int device_number_selected;
 	string device_input_choice;
 	
