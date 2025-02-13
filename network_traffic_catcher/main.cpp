@@ -22,19 +22,9 @@ int main()
 
 	DeviceManager* deviceManager = DeviceManager::getDeviceManager();
 
-	pcap_if_t* all_devices = NULL;
-	char error_buffer[PCAP_ERRBUF_SIZE];
-	unsigned short int number_of_devices = 0;
+	deviceManager->printDeviceList();
 
-	// Search for all available devices
-	if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, nullptr, &all_devices, error_buffer) == -1)
-	{
-		printf("Error finding devices : %s\n", error_buffer);
-		return -1;
-	}
-	if (all_devices == NULL) return -1;
-
-	printf("Listing all available devices...\n");
+	/*printf("Listing all available devices...\n");
 
 	for (pcap_if_t* devs = all_devices; devs != NULL; devs = devs->next)
 	{
@@ -45,7 +35,7 @@ int main()
         }
 		else
 			printf(" %s (No description available)\n", devs->name);
-	}
+	}*/
 
 	unsigned short int device_number_selected;
 	string device_input_choice;
@@ -57,8 +47,9 @@ int main()
 
 		try {
 			device_number_selected = stoi(device_input_choice);
-			if (device_number_selected > number_of_devices || device_number_selected == 0)
+			if (device_number_selected > deviceManager->getNumberOfDevices() || device_number_selected == 0)
 				throw out_of_range("");
+			deviceManager->setSelectedDevice(device_number_selected);
 			break;
 		}
 		catch (const invalid_argument& arg)
@@ -71,25 +62,11 @@ int main()
 		}
 	}
 
-	pcap_if_t* selected_device = all_devices;
-	
-	for (int i = 0; i < device_number_selected - 1; i++)
-	{
-		if (selected_device != NULL)
-			selected_device = selected_device->next;
-	}
-
-	if (selected_device == NULL)
-	{
-		printf("Error while selecting device...\n");
-		pcap_freealldevs(all_devices);
-		return -1;
-	}
-
-	printf("\nYou selected %s", selected_device->description);
+	deviceManager->printSelectedDevice();
+	char error_buffer[PCAP_ERRBUF_SIZE];
 
 	pcap_t* capture;
-	if ((capture = pcap_open(selected_device->name,
+	if ((capture = pcap_open(deviceManager->getSelectedDevice()->name,
 		65536,
 		0, // My PC doesn't support promiscuous mode
 		1000,
@@ -97,12 +74,11 @@ int main()
 		error_buffer
 	)) == NULL)
 	{
-		printf("\nUnable to open the adapter. %s is not supported by Npcap\n", selected_device->name);
-		pcap_freealldevs(all_devices);
+		printf("\nUnable to open the adapter. %s is not supported by Npcap\n", deviceManager->getSelectedDevice()->name);
 		return -1;
 	}
 
-	printf("\nListening on %s...\n", selected_device->description);
+	printf("\nListening on %s...\n", deviceManager->getSelectedDevice()->description);
 
 	// Port 80 for HTTP, port 443 for HTTPS : we filter websites
 	char packet_filter[] = "dst port 80 or dst port 443";
@@ -112,14 +88,12 @@ int main()
 	if (pcap_compile(capture, &filter_code, packet_filter, 1, netmask) < 0)
 	{
 		printf("\nUnable to compile the packet filter. Check the syntax.\n");
-		pcap_freealldevs(all_devices);
 		return -1;
 	}
 
 	if (pcap_setfilter(capture, &filter_code) < 0)
 	{
 		printf("\nError setting the filter.\n");
-		pcap_freealldevs(all_devices);
 		return -1;
 	}
 
@@ -134,7 +108,6 @@ int main()
 
 	pcap_close(capture);
 
-	pcap_freealldevs(all_devices);
 	return 0;
 }
 

@@ -1,10 +1,11 @@
 #include "DeviceManager.h"
 
 
+DeviceManager* DeviceManager::device_manager = nullptr;
+
+
 DeviceManager::DeviceManager()
 {
-	device_manager = new DeviceManager();
-
 	if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, nullptr, &all_devices, error_buffer) == -1)
 	{
 		printf("Error finding devices : %s\n", error_buffer);
@@ -32,7 +33,7 @@ void DeviceManager::printDeviceList()
 
 	printf("Listing all available devices...\n");
 
-	unsigned short int number_of_devices = 0;
+	number_of_devices = 0;
 	for (pcap_if_t* devs = all_devices; devs != nullptr; devs = devs->next)
 	{
 		printf("%d.", ++number_of_devices);
@@ -45,6 +46,12 @@ void DeviceManager::printDeviceList()
 			printf(" %s (No description available)\n", devs->name);
 		}
 	}
+}
+
+
+unsigned short int DeviceManager::getNumberOfDevices()
+{
+	return number_of_devices;
 }
 
 
