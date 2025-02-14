@@ -20,6 +20,7 @@ class DeviceManager
 		pcap_if_t* getSelectedDevice() { return selected_device; }
 		void setSelectedDevice(unsigned short int);
 		void printSelectedDevice();
+		void startCapture();
 
 		DeviceManager(DeviceManager& device_manager_copy) = delete;
 		void operator=(const DeviceManager&) = delete;

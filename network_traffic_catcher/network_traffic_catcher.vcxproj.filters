@@ -21,11 +21,11 @@
     <ClCompile Include="DeviceManager.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="tcp_header.h">
-      <Filter>Fichiers sources</Filter>
-    </ClInclude>
     <ClInclude Include="DeviceManager.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
@@ -33,6 +33,12 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="ip_header.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="tcp_header.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>

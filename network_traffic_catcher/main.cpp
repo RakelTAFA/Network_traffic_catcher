@@ -1,9 +1,8 @@
 #include<iostream>
-#include<string>
-#include<stdexcept>
 #include<csignal>
 #include<sstream>
 #include<WS2tcpip.h>
+#include "Console.h"
 #include "DeviceManager.h"
 #include "ip_header.h"
 #include "tcp_header.h"
@@ -23,6 +22,8 @@ int main()
 	DeviceManager* deviceManager = DeviceManager::getDeviceManager();
 
 	deviceManager->printDeviceList();
+
+	Console console();
 
 	unsigned short int device_number_selected;
 	string device_input_choice;
@@ -204,7 +205,7 @@ void packet_handler(u_char* param, const struct pcap_pkthdr* header, const u_cha
 
 void stop_program(int s)
 {
-	printf("\nSIGNAL : %d\n", s);
+	printf("Closing the programm.\n");
 	//pcap_breakloop(stop_program, capture); --> TODO: Implémenter structure pour accéder à l'objet capture 
 	printf("Closing the programm...\n");
 	exit(1);

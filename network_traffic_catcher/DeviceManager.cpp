@@ -78,6 +78,12 @@ void DeviceManager::printSelectedDevice()
 }
 
 
+void DeviceManager::startCapture()
+{
+	//...
+}
+
+
 DeviceManager::~DeviceManager()
 {
 	if (all_devices != nullptr) pcap_freealldevs(all_devices);
