@@ -46,6 +46,7 @@ void DeviceManager::printDeviceList()
 			printf(" %s (No description available)\n", devs->name);
 		}
 	}
+	printf("\n");
 }
 
 
@@ -73,14 +74,45 @@ void DeviceManager::setSelectedDevice(unsigned short int _selected_number)
 
 void DeviceManager::printSelectedDevice()
 {
-	if (selected_device != nullptr) printf("\nYou selected %s", selected_device->description);
-	else printf("No device selected...");
+	if (selected_device != nullptr) printf("You selected %s\n", selected_device->description);
+	else printf("No device selected...\n");
+}
+
+
+void DeviceManager::addWebsite(const char* _website)
+{
+	if (list_of_websites == nullptr)
+	{
+		list_of_websites = new const char* ();
+	}
+
+	// Todo : implement memory logic
+	/* *(list_of_websites) = new const char(*(_website));*/
+
+	number_of_websites++;
+}
+
+
+// TODO : ADAPT according to addWebsite
+void DeviceManager::deleteAllWebsites()
+{
+	if (list_of_websites == nullptr) return;
+	
+	for (unsigned short int i = 0; i < number_of_websites; i++)
+	{
+		if (*(list_of_websites) != nullptr)
+			delete *(list_of_websites + i);
+	}
+
+	delete list_of_websites;
+	number_of_websites = 0;
 }
 
 
 void DeviceManager::startCapture()
 {
 	//...
+	printf("CAPTURE !");
 }
 
 

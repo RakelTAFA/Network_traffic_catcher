@@ -10,8 +10,8 @@ class Console
 {
 	private:
 		map<const char*, const char*> input_choices = {
-			{"Target", "Type all website connections to catch, example : Target www.stackoverflow.com www.wikipedia.org"},
-			{"Select", "Select the device you want to use, example : Select 2"},
+			{"Target", "Type all website connections to catch.\n\tExample: Target www.stackoverflow.com www.wikipedia.org"},
+			{"Select", "Select the device you want to use.\n\tExample: Select 2"},
 			{"Launch", "Launches the live capture"},
 			{"Exit", "Exits the program"}
 		};

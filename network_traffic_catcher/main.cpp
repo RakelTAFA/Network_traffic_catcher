@@ -20,37 +20,15 @@ int main()
 	signal(SIGINT, stop_program);
 
 	DeviceManager* deviceManager = DeviceManager::getDeviceManager();
-
 	deviceManager->printDeviceList();
 
-	Console console();
+	Console console;
+	console.openConsole();
+	console.handleUserInput();
 
-	unsigned short int device_number_selected;
-	string device_input_choice;
-	
-	while (true)
-	{
-		cout << "\nSelect a device to use for packet capture by its number and press Enter: ";
-		cin >> device_input_choice;
+	return 0;
+	// TODO: next step, implement filters and start capture
 
-		try {
-			device_number_selected = stoi(device_input_choice);
-			if (device_number_selected > deviceManager->getNumberOfDevices() || device_number_selected == 0)
-				throw out_of_range("");
-			deviceManager->setSelectedDevice(device_number_selected);
-			break;
-		}
-		catch (const invalid_argument& arg)
-		{
-			cerr << "Invalid argument, waiting for an integer" << endl;
-		}
-		catch (const out_of_range& arg)
-		{
-			cerr << "Number out of range, enter another number" << endl;
-		}
-	}
-
-	deviceManager->printSelectedDevice();
 	char error_buffer[PCAP_ERRBUF_SIZE];
 
 	pcap_t* capture;
