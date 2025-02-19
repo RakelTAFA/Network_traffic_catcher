@@ -140,6 +140,7 @@
     <ClInclude Include="ip_address.h" />
     <ClInclude Include="ip_header.h" />
     <ClInclude Include="tcp_header.h" />
+    <ClInclude Include="website.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

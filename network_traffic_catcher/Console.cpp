@@ -19,8 +19,6 @@ void Console::openConsole()
 
 void Console::handleTargetCommand(string _command)
 {
-	device_manager->deleteAllWebsites();
-
 	// Removes unnecessary whitespaces at the end if needed
 	while (_command.back() == ' ')
 	{
@@ -35,6 +33,7 @@ void Console::handleTargetCommand(string _command)
 		device_manager->addWebsite(website.c_str());
 		_command.erase(_command.begin(), _command.begin() + website.length() + 1);
 	}
+	printf("Targeted websites registered correctly.\n");
 }
 
 
@@ -76,13 +75,25 @@ void Console::handleUserInput()
 		}
 		else if (input_treatment == "Target")
 		{
-			user_input.erase(user_input.begin(), user_input.begin() + input_treatment.length() + 1);
-			handleTargetCommand(user_input);
+			if (user_input.length() > input_treatment.length())
+			{
+				user_input.erase(user_input.begin(), user_input.begin() + input_treatment.length() + 1);
+				handleTargetCommand(user_input);
+			}
+			else {
+				printf("Please add arguments.\n");
+			}
 		}
 		else if (input_treatment == "Select")
 		{
-			user_input.erase(user_input.begin(), user_input.begin() + input_treatment.length() + 1);
-			handleSelectCommand(user_input);
+			if (user_input.length() > input_treatment.length())
+			{
+				user_input.erase(user_input.begin(), user_input.begin() + input_treatment.length() + 1);
+				handleSelectCommand(user_input);
+			}
+			else {
+				printf("Please add arguments.\n");
+			}
 		}
 		else if(input_treatment == "Launch")
 		{

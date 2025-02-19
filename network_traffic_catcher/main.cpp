@@ -9,10 +9,8 @@
 #pragma comment (lib, "Ws2_32.lib")
 using namespace std;
 
-
 void packet_handler(u_char*, const struct pcap_pkthdr*, const u_char*);
 void stop_program(int);
-
 
 int main()
 {
@@ -26,7 +24,9 @@ int main()
 	console.openConsole();
 	console.handleUserInput();
 
+	delete DeviceManager::getDeviceManager();
 	return 0;
+
 	// TODO: next step, implement filters and start capture
 
 	char error_buffer[PCAP_ERRBUF_SIZE];
@@ -177,14 +177,13 @@ void packet_handler(u_char* param, const struct pcap_pkthdr* header, const u_cha
 	}
 
 	freeaddrinfo(result);
-
 }
 
 
 void stop_program(int s)
 {
 	printf("Closing the programm.\n");
-	//pcap_breakloop(stop_program, capture); --> TODO: Implémenter structure pour accéder à l'objet capture 
-	printf("Closing the programm...\n");
+	//pcap_breakloop(stop_program, capture); --> TODO: Implémenter structure pour accéder à l'objet capture
+	delete DeviceManager::getDeviceManager();
 	exit(1);
 }

@@ -27,5 +27,6 @@ class Console
 		void handleUserInput();
 
 		Console(Console&) = delete;
+		
 };
 

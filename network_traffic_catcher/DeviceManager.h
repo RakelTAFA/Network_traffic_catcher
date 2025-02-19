@@ -1,6 +1,6 @@
 #pragma once
 #include<pcap.h>
-#include<string>
+#include "website.h"
 
 // Singleton, because we need only one reusable instance of DeviceManager
 class DeviceManager
@@ -11,8 +11,8 @@ class DeviceManager
 		char error_buffer[PCAP_ERRBUF_SIZE] = "";
 		unsigned short int number_of_devices = 0;
 		pcap_if_t* selected_device = nullptr;
-		const char** list_of_websites;
-		unsigned short int number_of_websites = 0;
+		website* websites = nullptr;
+		website* website_iterator = nullptr;
 
 		DeviceManager();
 

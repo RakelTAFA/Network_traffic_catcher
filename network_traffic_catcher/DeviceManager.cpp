@@ -81,31 +81,43 @@ void DeviceManager::printSelectedDevice()
 
 void DeviceManager::addWebsite(const char* _website)
 {
-	if (list_of_websites == nullptr)
+	if (websites == nullptr)
 	{
-		list_of_websites = new const char* ();
+		websites = new website();
+		website_iterator = websites;
 	}
 
-	// Todo : implement memory logic
-	/* *(list_of_websites) = new const char(*(_website));*/
+	website_iterator->name = new char[strlen(_website) + 1];
+	strcpy_s((char*)website_iterator->name, strlen(_website) + 1, _website);
+
+	website_iterator->next = new website();
+	website_iterator = website_iterator->next;
 
 	number_of_websites++;
 }
 
 
-// TODO : ADAPT according to addWebsite
 void DeviceManager::deleteAllWebsites()
 {
-	if (list_of_websites == nullptr) return;
-	
-	for (unsigned short int i = 0; i < number_of_websites; i++)
-	{
-		if (*(list_of_websites) != nullptr)
-			delete *(list_of_websites + i);
-	}
+	if (websites == nullptr) return;
 
-	delete list_of_websites;
-	number_of_websites = 0;
+	website* it = websites;
+	website* it_next = it->next;
+
+	// Easiest way of handling deletion
+	while (true)
+	{
+		if (it->name != nullptr)
+			delete[] it->name;
+
+		delete it;
+		it = it_next;
+
+		if (it == nullptr)
+			break;
+
+		it_next = it_next->next;
+	}
 }
 
 
@@ -120,6 +132,5 @@ DeviceManager::~DeviceManager()
 {
 	if (all_devices != nullptr) pcap_freealldevs(all_devices);
 	if (selected_device != nullptr) delete selected_device;
-
-	if (device_manager != nullptr) delete device_manager;
+	deleteAllWebsites();
 }
