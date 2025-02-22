@@ -1,12 +1,10 @@
-#include<iostream>
 #include<csignal>
 #include<sstream>
-#include<WS2tcpip.h>
+#include "DNSConverter.h"
 #include "Console.h"
 #include "DeviceManager.h"
 #include "ip_header.h"
 #include "tcp_header.h"
-#pragma comment (lib, "Ws2_32.lib")
 using namespace std;
 
 void packet_handler(u_char*, const struct pcap_pkthdr*, const u_char*);
@@ -25,54 +23,8 @@ int main()
 	console.handleUserInput();
 
 	delete DeviceManager::getDeviceManager();
-	return 0;
 
-	// TODO: next step, implement filters and start capture
-
-	char error_buffer[PCAP_ERRBUF_SIZE];
-
-	pcap_t* capture;
-	if ((capture = pcap_open(deviceManager->getSelectedDevice()->name,
-		65536,
-		0, // My PC doesn't support promiscuous mode
-		1000,
-		NULL,
-		error_buffer
-	)) == NULL)
-	{
-		printf("\nUnable to open the adapter. %s is not supported by Npcap\n", deviceManager->getSelectedDevice()->name);
-		return -1;
-	}
-
-	printf("\nListening on %s...\n", deviceManager->getSelectedDevice()->description);
-
-	// Port 80 for HTTP, port 443 for HTTPS : we filter websites
-	char packet_filter[] = "dst port 80 or dst port 443";
-	struct bpf_program filter_code;
-	u_int netmask = 0xFFFFFF; // = 255.255.255.0, for class C networks
-
-	if (pcap_compile(capture, &filter_code, packet_filter, 1, netmask) < 0)
-	{
-		printf("\nUnable to compile the packet filter. Check the syntax.\n");
-		return -1;
-	}
-
-	if (pcap_setfilter(capture, &filter_code) < 0)
-	{
-		printf("\nError setting the filter.\n");
-		return -1;
-	}
-
-	WSADATA wsaData = { 0 };
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-	{
-		printf("WSAStartup failed: %d\n", WSAGetLastError());
-		return -1;
-	}
-
-	pcap_loop(capture, 10, packet_handler, NULL); // Limit to 10 iterations for the moment in order to test
-
-	pcap_close(capture);
+	deviceManager->startCapture();
 
 	return 0;
 }
@@ -158,6 +110,7 @@ void packet_handler(u_char* param, const struct pcap_pkthdr* header, const u_cha
 	int iRetval, i = 1;
 	struct sockaddr_in* sockaddr_ipv4;
 	char retour[NI_MAXHOST];
+	
 	for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
 
 		printf("getaddrinfo response %d\n", i++);

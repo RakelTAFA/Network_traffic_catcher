@@ -23,6 +23,18 @@ DeviceManager* DeviceManager::getDeviceManager()
 }
 
 
+pcap_if_t* DeviceManager::getSelectedDevice()
+{
+	return selected_device;
+}
+
+
+website* DeviceManager::getWebsites()
+{
+	return websites;
+}
+
+
 void DeviceManager::printDeviceList()
 {
 	if (all_devices == nullptr)
@@ -121,16 +133,83 @@ void DeviceManager::deleteAllWebsites()
 }
 
 
+bool DeviceManager::openCapture()
+{
+	if ((capture = pcap_open(selected_device->name,
+		65536,
+		0,
+		1000,
+		NULL,
+		error_buffer
+	)) == NULL)
+	{
+		printf("\nUnable to open the adapter. %s is not supported by Npcap\n", selected_device->name);
+		return false;
+	}
+
+	// If promiscuous mode is supported, it will be set
+	pcap_set_promisc(capture, PCAP_OPENFLAG_PROMISCUOUS);
+
+	return true;
+}
+
+
+bool DeviceManager::defineFilter()
+{
+	// Port 80 for HTTP, port 443 for HTTPS. We filter websites.
+	char packet_filter[] = "dst port 80 or dst port 443";
+
+	struct bpf_program filter_code;
+	
+	// 255.255.255.0 for class C networks
+	u_int netmask = 0xFFFFFF;
+
+	// Must never occur since the filter is not defined by the user.
+	// May become useful in a future update.
+	if (pcap_compile(capture, &filter_code, packet_filter, 1, netmask) < 0)
+	{
+		printf("\nUnable to compile the packet filter. Check the syntax.\n");
+		return false;
+	}
+
+	if (int error = pcap_setfilter(capture, &filter_code) != 0)
+	{
+		printf("\nError %d occured when setting the filter: %s\n", error, pcap_geterr(capture));
+		return false;
+	}
+
+	return true;
+}
+
+
 void DeviceManager::startCapture()
 {
-	//...
-	printf("CAPTURE !");
+	if (!openCapture()) return;
+	if (!defineFilter()) return;
+
+	struct pcap_pkthdr* header = nullptr;
+	const u_char* packet_data = nullptr;
+	int result;
+
+	ip_header* ip_h;
+
+	while (result = pcap_next_ex(capture, &header, &packet_data) >= 0)
+	{
+		ip_h = (ip_header*)(packet_data + 14);
+	}
+
+	if (result == -1)
+	{
+		printf("Error reading the packets: %s\n", pcap_geterr(capture));
+	}
 }
 
 
 DeviceManager::~DeviceManager()
 {
+	if (capture != nullptr) pcap_close(capture);
 	if (all_devices != nullptr) pcap_freealldevs(all_devices);
 	if (selected_device != nullptr) delete selected_device;
+
 	deleteAllWebsites();
 }

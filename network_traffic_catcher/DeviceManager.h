@@ -1,5 +1,6 @@
 #pragma once
 #include<pcap.h>
+#include "ip_header.h"
 #include "website.h"
 
 // Singleton, because we need only one reusable instance of DeviceManager
@@ -13,14 +14,18 @@ class DeviceManager
 		pcap_if_t* selected_device = nullptr;
 		website* websites = nullptr;
 		website* website_iterator = nullptr;
+		pcap_t* capture = nullptr;
 
 		DeviceManager();
+		bool openCapture();
+		bool defineFilter();
 
 	public:
 		static DeviceManager* getDeviceManager();
 		void printDeviceList();
 		unsigned short int getNumberOfDevices();
-		pcap_if_t* getSelectedDevice() { return selected_device; }
+		pcap_if_t* getSelectedDevice();
+		website* getWebsites();
 		void setSelectedDevice(unsigned short int);
 		void printSelectedDevice();
 		void addWebsite(const char*);

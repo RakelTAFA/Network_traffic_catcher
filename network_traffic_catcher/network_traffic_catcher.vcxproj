@@ -132,11 +132,13 @@
   <ItemGroup>
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="DeviceManager.cpp" />
+    <ClCompile Include="DNSConverter.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Console.h" />
     <ClInclude Include="DeviceManager.h" />
+    <ClInclude Include="DNSConverter.h" />
     <ClInclude Include="ip_address.h" />
     <ClInclude Include="ip_header.h" />
     <ClInclude Include="tcp_header.h" />

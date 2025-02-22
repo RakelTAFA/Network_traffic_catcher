@@ -24,7 +24,7 @@ void Console::handleTargetCommand(string _command)
 	{
 		_command.pop_back();
 	}
-	// Adds only one whitespace to avoid out of bands array error
+	// Adds only one whitespace to avoid out of bounds error
 	_command.push_back(' ');
 
 	while (_command.length() > 0)
@@ -97,7 +97,19 @@ void Console::handleUserInput()
 		}
 		else if(input_treatment == "Launch")
 		{
-			device_manager->startCapture();
+			bool can_start = true;
+			if (device_manager->getSelectedDevice() == nullptr)
+			{
+				printf("Please select a device before starting the capture !\n");
+				can_start = false;
+			}
+			if (device_manager->getWebsites() == nullptr)
+			{
+				printf("Enter all websites targeted before starting the capture !\n");
+				can_start = false;
+			}
+			if (can_start)
+				device_manager->startCapture();
 		}
 		else {
 			printf("Incorrect input, try again.\n");
