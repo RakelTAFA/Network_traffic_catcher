@@ -1,7 +1,7 @@
 #pragma once
 #include<pcap.h>
+#include "DNSConverter.h"
 #include "ip_header.h"
-#include "website.h"
 
 // Singleton, because we need only one reusable instance of DeviceManager
 class DeviceManager
@@ -15,6 +15,8 @@ class DeviceManager
 		website* websites = nullptr;
 		website* website_iterator = nullptr;
 		pcap_t* capture = nullptr;
+
+		DNSConverter* converter = nullptr;
 
 		DeviceManager();
 		bool openCapture();

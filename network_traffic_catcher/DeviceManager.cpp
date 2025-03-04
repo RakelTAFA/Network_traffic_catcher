@@ -10,6 +10,7 @@ DeviceManager::DeviceManager()
 	{
 		printf("Error finding devices : %s\n", error_buffer);
 	}
+	if (converter == nullptr) converter = new DNSConverter();
 }
 
 
@@ -99,6 +100,7 @@ void DeviceManager::addWebsite(const char* _website)
 		website_iterator = websites;
 	}
 
+	converter->convertDnsNameToIPv4(website_iterator, _website);
 	website_iterator->name = new char[strlen(_website) + 1];
 	strcpy_s((char*)website_iterator->name, strlen(_website) + 1, _website);
 
@@ -121,6 +123,12 @@ void DeviceManager::deleteAllWebsites()
 	{
 		if (it->name != nullptr)
 			delete[] it->name;
+
+		for (const char* ip : it->ip_addresses)
+		{
+			delete [] ip;
+		}
+		it->ip_addresses.clear();
 
 		delete it;
 		it = it_next;
@@ -147,7 +155,7 @@ bool DeviceManager::openCapture()
 		return false;
 	}
 
-	// If promiscuous mode is supported, it will be set
+	// If promiscuous mode is supported it will be enabled automatically
 	pcap_set_promisc(capture, PCAP_OPENFLAG_PROMISCUOUS);
 
 	return true;
@@ -207,6 +215,7 @@ void DeviceManager::startCapture()
 
 DeviceManager::~DeviceManager()
 {
+	if (converter != nullptr) delete converter;
 	if (capture != nullptr) pcap_close(capture);
 	if (all_devices != nullptr) pcap_freealldevs(all_devices);
 	if (selected_device != nullptr) delete selected_device;

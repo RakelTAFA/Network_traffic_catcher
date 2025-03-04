@@ -83,7 +83,6 @@ void packet_handler(u_char* param, const struct pcap_pkthdr* header, const u_cha
 	printf("test : %s\n", test);*/
 
 	struct addrinfo* result = NULL;
-	struct addrinfo* ptr = NULL;
 	struct addrinfo hints;
 
 	LPSOCKADDR sockaddr_ip;
@@ -111,7 +110,7 @@ void packet_handler(u_char* param, const struct pcap_pkthdr* header, const u_cha
 	struct sockaddr_in* sockaddr_ipv4;
 	char retour[NI_MAXHOST];
 	
-	for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
+	for (struct addrinfo* ptr = result; ptr != NULL; ptr = ptr->ai_next) {
 
 		printf("getaddrinfo response %d\n", i++);
 		printf("\tFlags: 0x%x\n", ptr->ai_flags);
