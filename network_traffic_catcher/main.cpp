@@ -20,8 +20,6 @@ int main()
 
 	delete DeviceManager::getDeviceManager();
 
-	deviceManager->startCapture();
-
 	return 0;
 }
 
