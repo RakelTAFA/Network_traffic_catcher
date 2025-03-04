@@ -2,7 +2,6 @@
 #include "Console.h"
 #include "ip_header.h"
 #include "tcp_header.h"
-using namespace std;
 
 void packet_handler(u_char*, const struct pcap_pkthdr*, const u_char*);
 void stop_program(int);
