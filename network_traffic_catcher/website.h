@@ -3,8 +3,7 @@
 using namespace std;
 
 #define IP_MAX_LENGTH 16
-
-static unsigned short int number_of_websites = 0;
+#define MAX_NUMBER_OF_WEBSITES 100
 
 typedef struct website {
 	const char* name;

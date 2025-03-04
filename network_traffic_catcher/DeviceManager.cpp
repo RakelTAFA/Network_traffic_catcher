@@ -49,7 +49,7 @@ void DeviceManager::printDeviceList()
 	number_of_devices = 0;
 	for (pcap_if_t* devs = all_devices; devs != nullptr; devs = devs->next)
 	{
-		printf("%d.", ++number_of_devices);
+		printf("%u.", ++number_of_devices);
 		if (devs->description)
 		{
 			printf(" %s\n", devs->description);
@@ -63,9 +63,15 @@ void DeviceManager::printDeviceList()
 }
 
 
-unsigned short int DeviceManager::getNumberOfDevices()
+unsigned short DeviceManager::getNumberOfDevices()
 {
 	return number_of_devices;
+}
+
+
+unsigned short DeviceManager::getNumberOfWebsites()
+{
+	return number_of_websites;
 }
 
 
@@ -94,6 +100,12 @@ void DeviceManager::printSelectedDevice()
 
 void DeviceManager::addWebsite(const char* _website)
 {
+	if (number_of_websites > MAX_NUMBER_OF_WEBSITES)
+	{
+
+		return;
+	}
+
 	if (websites == nullptr)
 	{
 		websites = new website();

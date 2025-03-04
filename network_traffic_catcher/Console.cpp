@@ -30,6 +30,13 @@ void Console::handleTargetCommand(string _command)
 	while (_command.length() > 0)
 	{
 		string website = _command.substr(0, _command.find(" "));
+
+		if (device_manager->getNumberOfWebsites() > MAX_NUMBER_OF_WEBSITES - 1)
+		{
+			printf("You can not scan more than %u websites. Stopping at %s\n", MAX_NUMBER_OF_WEBSITES, website.c_str());
+			break;
+		}
+
 		device_manager->addWebsite(website.c_str());
 		_command.erase(_command.begin(), _command.begin() + website.length() + 1);
 	}

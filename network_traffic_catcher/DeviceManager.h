@@ -14,6 +14,7 @@ class DeviceManager
 		pcap_if_t* selected_device = nullptr;
 		website* websites = nullptr;
 		website* website_iterator = nullptr;
+		unsigned short number_of_websites = 0;
 		pcap_t* capture = nullptr;
 
 		DNSConverter* converter = nullptr;
@@ -25,7 +26,8 @@ class DeviceManager
 	public:
 		static DeviceManager* getDeviceManager();
 		void printDeviceList();
-		unsigned short int getNumberOfDevices();
+		unsigned short getNumberOfDevices();
+		unsigned short getNumberOfWebsites();
 		pcap_if_t* getSelectedDevice();
 		website* getWebsites();
 		void setSelectedDevice(unsigned short int);
