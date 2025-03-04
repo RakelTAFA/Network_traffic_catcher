@@ -1,8 +1,5 @@
 #include<csignal>
-#include<sstream>
-#include "DNSConverter.h"
 #include "Console.h"
-#include "DeviceManager.h"
 #include "ip_header.h"
 #include "tcp_header.h"
 using namespace std;
@@ -81,54 +78,6 @@ void packet_handler(u_char* param, const struct pcap_pkthdr* header, const u_cha
 	/*char test[NI_MAXHOST];
 	inet_ntop(AF_INET, ip_address_string, test, NI_MAXHOST);
 	printf("test : %s\n", test);*/
-
-	struct addrinfo* result = NULL;
-	struct addrinfo hints;
-
-	LPSOCKADDR sockaddr_ip;
-
-	char ipstringbuffer[46];
-	DWORD ipbufferlength = 46;
-
-	ZeroMemory(&hints, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-
-	DWORD retval;
-
-	string tcp_port = "" + tcp_h->dst_port;
-
-	retval = getaddrinfo("www.stackoverflow.com" , tcp_port.c_str(), &hints, &result);
-	if (retval != 0)
-	{
-		printf("getaddrinfo failed with error: %d\n", retval);
-		return;
-	}
-
-	int iRetval, i = 1;
-	struct sockaddr_in* sockaddr_ipv4;
-	char retour[NI_MAXHOST];
-	
-	for (struct addrinfo* ptr = result; ptr != NULL; ptr = ptr->ai_next) {
-
-		printf("getaddrinfo response %d\n", i++);
-		printf("\tFlags: 0x%x\n", ptr->ai_flags);
-		printf("\tFamily: ");
-		switch (ptr->ai_family) {
-		case AF_UNSPEC:
-			printf("Unspecified\n");
-			break;
-		case AF_INET:
-			printf("AF_INET (IPv4)\n");
-			sockaddr_ipv4 = (struct sockaddr_in*)ptr->ai_addr;
-			printf("\tIPv4 address %s\n",
-				inet_ntop(AF_INET, &sockaddr_ipv4->sin_addr, retour, NI_MAXHOST));
-			break;
-		}
-	}
-
-	freeaddrinfo(result);
 }
 
 
