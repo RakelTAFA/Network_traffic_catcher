@@ -202,18 +202,10 @@ bool DeviceManager::defineFilter()
 }
 
 
-void DeviceManager::packet_handler(u_char* param, const struct pcap_pkthdr* header, const u_char* pkt_data)
-{
-
-}
-
-
 void DeviceManager::startCapture()
 {
 	if (!openCapture()) return;
 	if (!defineFilter()) return;
-
-	//pcap_loop(capture, 0, packet_handler, nullptr);
 
 	struct pcap_pkthdr* header = nullptr;
 	const u_char* packet_data = nullptr;

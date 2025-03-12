@@ -37,8 +37,6 @@ class DeviceManager
 		void deleteAllWebsites();
 		void startCapture();
 
-		void packet_handler(u_char*, const struct pcap_pkthdr*, const u_char*);
-
 		DeviceManager(DeviceManager& device_manager_copy) = delete;
 		void operator=(const DeviceManager&) = delete;
 		~DeviceManager();
