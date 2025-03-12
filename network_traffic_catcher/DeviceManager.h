@@ -14,6 +14,7 @@ class DeviceManager
 		pcap_if_t* selected_device = nullptr;
 		website* websites = nullptr;
 		website* website_iterator = nullptr;
+		vector<const char*> ip_list;
 		unsigned short number_of_websites = 0;
 		pcap_t* capture = nullptr;
 
@@ -35,6 +36,8 @@ class DeviceManager
 		void addWebsite(const char*);
 		void deleteAllWebsites();
 		void startCapture();
+
+		void packet_handler(u_char*, const struct pcap_pkthdr*, const u_char*);
 
 		DeviceManager(DeviceManager& device_manager_copy) = delete;
 		void operator=(const DeviceManager&) = delete;

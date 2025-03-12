@@ -1,6 +1,8 @@
 #pragma once
 #include "ip_address.h"
 
+#define ETHERNET_LENGTH 14
+
 typedef struct {
 	u_char version_ip_header_length;
 	u_char type_of_service;

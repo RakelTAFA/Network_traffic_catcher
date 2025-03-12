@@ -102,7 +102,6 @@ void DeviceManager::addWebsite(const char* _website)
 {
 	if (number_of_websites > MAX_NUMBER_OF_WEBSITES)
 	{
-
 		return;
 	}
 
@@ -115,6 +114,7 @@ void DeviceManager::addWebsite(const char* _website)
 	converter->convertDnsNameToIPv4(website_iterator, _website);
 	website_iterator->name = new char[strlen(_website) + 1];
 	strcpy_s((char*)website_iterator->name, strlen(_website) + 1, _website);
+	ip_list.insert(ip_list.end(), website_iterator->ip_addresses.begin(), website_iterator->ip_addresses.end());
 
 	website_iterator->next = new website();
 	website_iterator = website_iterator->next;
@@ -159,9 +159,9 @@ bool DeviceManager::openCapture()
 		65536,
 		0,
 		1000,
-		NULL,
+		nullptr,
 		error_buffer
-	)) == NULL)
+	)) == nullptr)
 	{
 		printf("\nUnable to open the adapter. %s is not supported by Npcap\n", selected_device->name);
 		return false;
@@ -202,10 +202,18 @@ bool DeviceManager::defineFilter()
 }
 
 
+void DeviceManager::packet_handler(u_char* param, const struct pcap_pkthdr* header, const u_char* pkt_data)
+{
+
+}
+
+
 void DeviceManager::startCapture()
 {
 	if (!openCapture()) return;
 	if (!defineFilter()) return;
+
+	//pcap_loop(capture, 0, packet_handler, nullptr);
 
 	struct pcap_pkthdr* header = nullptr;
 	const u_char* packet_data = nullptr;
@@ -215,7 +223,18 @@ void DeviceManager::startCapture()
 
 	while (result = pcap_next_ex(capture, &header, &packet_data) >= 0)
 	{
-		ip_h = (ip_header*)(packet_data + 14);
+		if (packet_data == nullptr)
+			continue;
+
+		ip_h = (ip_header*)(packet_data + ETHERNET_LENGTH);
+		char bytes[IP_MAX_LENGTH];
+		snprintf(bytes, IP_MAX_LENGTH, "%d.%d.%d.%d", ip_h->dst_addr.byte1, ip_h->dst_addr.byte2, ip_h->dst_addr.byte3, ip_h->dst_addr.byte4);
+
+		for (const char* it : ip_list)
+		{
+			if ((string)bytes == (string)it)
+				printf("CONNECTION TO %s !\n", bytes);
+		}
 	}
 
 	if (result == -1)
@@ -227,9 +246,9 @@ void DeviceManager::startCapture()
 
 DeviceManager::~DeviceManager()
 {
-	if (converter != nullptr) delete converter;
 	if (capture != nullptr) pcap_close(capture);
 	if (all_devices != nullptr) pcap_freealldevs(all_devices);
+	if (converter != nullptr) delete converter;
 	if (selected_device != nullptr) delete selected_device;
 
 	deleteAllWebsites();
