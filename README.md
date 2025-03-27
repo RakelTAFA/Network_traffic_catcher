@@ -1,10 +1,10 @@
-[NOT FINISHED]
 
 # 🛜 Network Traffic Catcher
 
 ## Introduction
 
-The purpose of this project is to filter traffic network and notify me when a connection to a non desired website or service from a device using the network occurs (like a Proxy).\
+The purpose of this project is to filter traffic network and notify me when a connection to a non desired website or service from a device using the network occurs (like a Proxy).
+
 It was a good oppportunity for me to learn more about networks in general, and to get in touch with network and low-level programming.
 <br/>
 <br/>
@@ -27,35 +27,50 @@ Windows Sockets 2 exists natively in Windows and especially in Visual Studio 202
 
 ## Issues encountered during development
 
-### Npcap's setup in Visual Studio 2022
+### - Npcap's setup in Visual Studio 2022
 
 First of all, I needed to download the [Npcap 1.80 installer](https://npcap.com/#download) (or a newer version) and to install it because our app needs Npcap's dlls to run.
 
-Then it becomes a little bit tricky. We need to download the [Npcap SDK 1.13 ZIP file] (or a newer version) and to unzip it anywhere. (TO CONTINUE)
-<br/>
-<br/>
+Once the installation is done, we need to download the [Npcap SDK 1.13 ZIP file](https://npcap.com/#download) (or a newer version) and to unzip it to an easily accessible folder.
 
-### Promiscuous mode
-
-Not all Network Interface Cards (NIC) support the <i>Promiscuous Mode</i> and we can discover it thanks the following PowerShell command which lists interfaces and returns `True` or `False` for each one :
+Then it becomes a little bit tricky. I needed to configure my Visual Studio project to add external libraries, includes and additional directories. I went to Project > Properties > Configuration Properties and then I modfied some settings among all the listed ones in different sections :
+- Firstly I went to Linker > General > Additional Library Directories and edited it to add the absolute path to my `Lib` directory of the Npcap folder like `C:\npcap\folder\Lib`
+- Secondly I went to Linker > Input > Additional Dependencies and added the two following lines
 ```
+C:\npcap\folder\Lib\x64\wpcap.lib
+C:\npcap\folder\Lib\x64\Packet.lib
+```
+- Finally I went to C/C++ > General > Additional Include Directories and added the `C:\npcap\folder\Include` path.
+
+No need to manipulate PATH variables.
+<br/>
+<br/>
+
+### - Promiscuous mode
+
+Not all Network Interface Cards (NIC) support the _Promiscuous Mode_ and we can discover it thanks the following PowerShell command which lists interfaces and returns `True` or `False` for each one :
+```PowerShell
 Get-NetAdapter | Format-List -Property PromiscuousMode, Name
 ```
 
-This mode allows the NIC to listen the entire network and not only packets destined to the NIC itself. It means that it can catch connections from all devices in the same network. The issue is that my NIC doesn't support Promiscuous Mode, so I need to create a Hotspot with my PC and to connect all devices to it in order to catch transiting packets (my PC must act as a <i>man-in-the-middle</i> in this case).
+This mode allows the NIC to listen the entire network and not only packets destined to the NIC itself. It means that it can catch connections from all devices in the same network. The issue is that my NIC doesn't support Promiscuous Mode, so I need to create a Hotspot with my PC and to connect all devices to it in order to catch transiting packets (my PC must act as a _man-in-the-middle_ in this case).
 <br/>
 <br/>
 
-### IPv4 Resolving from domain name
+### - IPv4 Resolving from domain name
 
-- Resolving DNS IP addresses : if we want to notify when a connection to a specified website occurs, we need to get the DNS name linked to the IP address, here's why :
-  - Let's say that we want to notify when a connection to www.stackoverflow.com occurs.\
-      When we run the following command `Resolve-DnsName -Name www.stackoverflow.com -Type A | Select IPAddress` in a PowerShell prompt, we can get one or many     IPv4 addresses.\
-      So it means that we can't filter on IPv4 addresses but only on DNS names in order ensure that all connections to stackoverflow will be notified, and not only some of them if many IPv4 addresses exist.
-  - PROBLEM : It's not easy to resolve the DNS name when we capture the packet from the IP address
-      - Either we need to run a powershell script with the above command, but many issues appear :
-        - This solution needs to be adapted depending on the operating system (PowerShell for Windows, any other Shell for Unix based systems)
-        - In Windows especially, we need to manipulate the script in order to be able to call it (Set-ExecutionPolicy to RemoteSigned and Unblock-File <path_to_file>) but it opens security problems by changing rights scripts execution
-        - It's more costly in terms of resources.
+If we want to notify when a connection to a specified website occurs, we need to get the DNS name linked to the IP address, here's the explanation why.
 
-So the solution was to use the Windows Socket 2 library (with the `ws2tcpip.h` header), which was a little bit touchy to understand but works really well.
+Let's say that we want to be notified when a connection to www.stackoverflow.com occurs.
+
+When we run `Resolve-DnsName -Name www.stackoverflow.com -Type A | Select IPAddress` in a PowerShell prompt, it can return one or many IPv4 addresses depending on the website. It means that we can't filter on IPv4 addresses but only on DNS names in order to ensure that all connections to www.stackoverflow.com will be notified and not only a part. This is because some domains may have multiple servers for reliability and performance reasons.
+
+The main problem is that it is not easy to resolve the DNS name when we capture the packet from the IP address.\
+Either we need to run a powershell script with the above command, but many issues appear :
+  - This solution must be adapted depending on the operating system (PowerShell for Windows, any other Shell for Unix based systems)
+  - In Windows especially, we need to modify execution rights on PowerShell scripts in general with `Set-ExecutionPolicy to RemoteSigned and Unblock-File <path_to_file>` in order to be able to call it, however it opens security problems. In Windows it is not possible to change executions rights for only one script, either we do it for all or we do not.
+  - It is not really performant.
+
+So the solution was to use the _Windows Socket 2_ library (with the `ws2tcpip.h` header), which was a little bit touchy to understand but works really well.
+
+[More to come...]
