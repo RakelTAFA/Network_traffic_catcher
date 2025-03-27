@@ -30,7 +30,7 @@ pcap_if_t* DeviceManager::getSelectedDevice()
 }
 
 
-website* DeviceManager::getWebsites()
+vector<website*> DeviceManager::getWebsites()
 {
 	return websites;
 }
@@ -105,50 +105,38 @@ void DeviceManager::addWebsite(const char* _website)
 		return;
 	}
 
-	if (websites == nullptr)
+	website* new_website = new website();
+
+	if (!converter->convertDnsNameToIPv4(new_website, _website))
 	{
-		websites = new website();
-		website_iterator = websites;
-	}
+		delete new_website;
+		return;
+	};
 
-	converter->convertDnsNameToIPv4(website_iterator, _website);
-	website_iterator->name = new char[strlen(_website) + 1];
-	strcpy_s((char*)website_iterator->name, strlen(_website) + 1, _website);
-	ip_list.insert(ip_list.end(), website_iterator->ip_addresses.begin(), website_iterator->ip_addresses.end());
+	new_website->name = new char[strlen(_website) + 1];
+	strcpy_s((char*)new_website->name, strlen(_website) + 1, _website);
 
-	website_iterator->next = new website();
-	website_iterator = website_iterator->next;
-
+	websites.push_back(new_website);
+	
 	number_of_websites++;
 }
 
 
 void DeviceManager::deleteAllWebsites()
 {
-	if (websites == nullptr) return;
+	if (websites.size() < 1) return;
 
-	website* it = websites;
-	website* it_next = it->next;
-
-	// Easiest way of handling deletion
-	while (true)
+	for (website* it : websites)
 	{
 		if (it->name != nullptr)
 			delete[] it->name;
 
 		for (const char* ip : it->ip_addresses)
 		{
-			delete [] ip;
+			delete[] ip;
 		}
-		it->ip_addresses.clear();
 
 		delete it;
-		it = it_next;
-
-		if (it == nullptr)
-			break;
-
-		it_next = it_next->next;
 	}
 }
 
@@ -222,10 +210,18 @@ void DeviceManager::startCapture()
 		char bytes[IP_MAX_LENGTH];
 		snprintf(bytes, IP_MAX_LENGTH, "%d.%d.%d.%d", ip_h->dst_addr.byte1, ip_h->dst_addr.byte2, ip_h->dst_addr.byte3, ip_h->dst_addr.byte4);
 
-		for (const char* it : ip_list)
+		for (website* web_it : websites)
 		{
-			if ((string)bytes == (string)it)
-				printf("CONNECTION TO %s !\n", bytes);
+			for (const char* char_it : web_it->ip_addresses)
+			{
+				// We register the connection only once otherwise the console is flooded
+				// This works only if there is one user on the network. It'll be adapted to register connection for each user so that each user is traced
+				if (!web_it->connection_registered && (string)bytes == (string)char_it)
+				{
+					printf("Connection to %s from %s detected (server %s).\n", web_it->name, "DEVICE INFO", bytes);
+					web_it->connection_registered = true;
+				}
+			}
 		}
 	}
 

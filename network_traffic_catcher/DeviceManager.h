@@ -12,9 +12,7 @@ class DeviceManager
 		char error_buffer[PCAP_ERRBUF_SIZE] = "";
 		unsigned short int number_of_devices = 0;
 		pcap_if_t* selected_device = nullptr;
-		website* websites = nullptr;
-		website* website_iterator = nullptr;
-		vector<const char*> ip_list;
+		vector<website*> websites;
 		unsigned short number_of_websites = 0;
 		pcap_t* capture = nullptr;
 
@@ -30,7 +28,7 @@ class DeviceManager
 		unsigned short getNumberOfDevices();
 		unsigned short getNumberOfWebsites();
 		pcap_if_t* getSelectedDevice();
-		website* getWebsites();
+		vector<website*> getWebsites();
 		void setSelectedDevice(unsigned short int);
 		void printSelectedDevice();
 		void addWebsite(const char*);

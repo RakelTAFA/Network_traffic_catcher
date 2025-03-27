@@ -110,7 +110,7 @@ void Console::handleUserInput()
 				printf("Please select a device before starting the capture.\n");
 				can_start = false;
 			}
-			if (device_manager->getWebsites() == nullptr)
+			if (device_manager->getWebsites().size() < 1)
 			{
 				printf("Enter all websites targeted before starting the capture.\n");
 				can_start = false;

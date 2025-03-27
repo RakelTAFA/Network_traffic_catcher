@@ -6,7 +6,7 @@ using namespace std;
 #define MAX_NUMBER_OF_WEBSITES 100
 
 typedef struct website {
-	const char* name;
+	const char* name = nullptr;
 	vector<const char*> ip_addresses;
-	struct website* next;
+	bool connection_registered = false;
 } website;
