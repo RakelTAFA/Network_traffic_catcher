@@ -29,7 +29,9 @@ Windows Sockets 2 exists natively in Windows and especially in Visual Studio 202
 
 ### Npcap's setup in Visual Studio 2022
 
---> DETAIL
+First of all, I needed to download the [Npcap 1.80 installer](https://npcap.com/#download) (or a newer version) and to install it because our app needs Npcap's dlls to run.
+
+Then it becomes a little bit tricky. We need to download the [Npcap SDK 1.13 ZIP file] (or a newer version) and to unzip it anywhere. (TO CONTINUE)
 <br/>
 <br/>
 
