@@ -1,7 +1,5 @@
 #include<csignal>
 #include "Console.h"
-#include "ip_header.h"
-#include "tcp_header.h"
 
 void stop_program(int);
 
