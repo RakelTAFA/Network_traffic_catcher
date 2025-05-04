@@ -24,7 +24,7 @@ bool DNSConverter::convertDnsNameToIPv4(website* _website, const char* _website_
 
 	if (DWORD result_value = getaddrinfo(_website_name, "https", &hints, &result) != 0)
 	{
-		printf("Unable to get address informations on %s: the DNS may not exist...\n", _website_name);
+		printf("Unable to obtain information for %s: the DNS may not exist...\n", _website_name);
 		return false;
 	}
 	printf("Adding %s:\n", _website_name);

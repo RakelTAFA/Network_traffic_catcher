@@ -49,7 +49,7 @@ void Console::handleSelectCommand(string _command)
 	unsigned short int device_number;
 	try {
 		device_number = stoi(_command);
-		if (device_number > device_manager->getNumberOfDevices() || device_manager == 0)
+		if (device_number > device_manager->getNumberOfDevices() || device_number == 0)
 			throw out_of_range("");
 		device_manager->setSelectedDevice(device_number);
 		device_manager->printSelectedDevice();

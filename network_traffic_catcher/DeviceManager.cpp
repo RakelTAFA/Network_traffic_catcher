@@ -218,7 +218,9 @@ void DeviceManager::startCapture()
 				// This works only if there is one user on the network. It'll be adapted to register connection for each user so that each user is traced
 				if (!web_it->connection_registered && (string)bytes == (string)char_it)
 				{
-					printf("Connection to %s from %s detected (server %s).\n", web_it->name, "DEVICE INFO", bytes);
+					char source[IP_MAX_LENGTH];
+					snprintf(source, IP_MAX_LENGTH, "%d.%d.%d.%d", ip_h->src_addr.byte1, ip_h->src_addr.byte2, ip_h->src_addr.byte3, ip_h->src_addr.byte4);
+					printf("Connection to %s from %s detected (server %s).\n", web_it->name, source, bytes);
 					web_it->connection_registered = true;
 				}
 			}
