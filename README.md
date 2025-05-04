@@ -29,7 +29,7 @@ Windows Sockets 2 exists natively in Windows and especially in Visual Studio 202
 
 <img src="https://github.com/user-attachments/assets/0aa8e6e4-a334-40c2-a6d5-012f567631c7" alt="Demo image" width="512">\
 
-The project is not finished, but here you can see how it globally works. In this example, the `DEVICE INFO` text in the results will be changed with the client who is trying to connect informations (IP Address, Name or whatever...).
+The project is not finished, but here you can see how it globally works.
 <br/>
 <br/>
 
